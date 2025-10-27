@@ -251,5 +251,80 @@ play_time_hours = 8
 * Обработка ввода: с помощью keyboard проверяем нажатые клавиши и перемещаем игрока.
 
 * Проверка столкновений: с монетами (увеличиваем счет и создаем новую монету) и с препятствиями (завершаем игру).
+```
+import random
+import time
+import os
+import keyboard
 
+pos_player = {'x':0, 'y':0}
+score = 0
+
+
+def draw_area(area):
+    os.system('cls')
+    for row in area:
+        print(''.join(row))
+    print(pos_player)
+    print(f"score:{score}")
+
+def gen_area(height, width):
+    area = []
+    for i in range(height):
+        if i == 0 or i == height - 1:
+            area.append(list("#"*width))
+        else:
+            area.append(list("#" + " "*(width-2) + "#"))
+    draw_area(area)
+    for i, row in enumerate(area):
+        for j, element in enumerate(row):
+            if element == ' ':
+                if random.randint(1, 100) < 5:
+                    area[i][j] = "$"
+                elif random.randint(1, 100) < 10:
+                    area[i][j] = "#"
+
+            draw_area(area)
+            time.sleep(0.01)
+    return area
+
+def add_player(area):
+    for i, row in enumerate(area):
+        for j, element in enumerate(row):
+            if element == ' ':
+                area[i][j] = "@"
+                pos_player['x'] = i
+                pos_player['y'] = j
+                return area
+
+def move_player(area, dx, dy):
+    global score
+    new_x = pos_player['x'] + dx
+    new_y = pos_player['y'] + dy
+    if area[new_y][new_x] == '#':
+        return
+    if area[new_y][new_x] == '$':
+        score += 1
+
+    area[pos_player['y']][pos_player['x']] = ' '
+    area[new_y][new_x] = '@'
+    pos_player['x'] = new_x
+    pos_player['y'] = new_y
+
+    draw_area(area)
+    time.sleep(0.2)
+
+def main():
+    area = gen_area(10, 20)
+    area = add_player(area)
+    while True:
+        if keyboard.is_pressed('w'): move_player(area, dx=0, dy=-1)
+        elif keyboard.is_pressed('s'): move_player(area, dx=0, dy=1)
+        elif keyboard.is_pressed('a'): move_player(area, dx=-1, dy=0)
+        elif keyboard.is_pressed('d'): move_player(area, dx=1, dy=0)
+
+
+main()
+
+```
 
