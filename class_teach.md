@@ -24,6 +24,233 @@ print(f"Площадь: {circle.area():.2f}")  # 78.54
 print(f"Периметр: {circle.perimeter():.2f}")  # 31.42
 ```
 
+
+## Задание 1: Система геометрических фигур
+
+```python
+from abc import ABC, abstractmethod
+from math import pi
+
+# 1. АБСТРАКТНЫЙ КЛАСС - базовый для всех фигур
+class Shape(ABC):
+    """
+    Абстрактный класс Shape определяет общий интерфейс для всех фигур.
+    Нельзя создать объект этого класса напрямую - только через наследников.
+    """
+    
+    def __init__(self, color: str) -> None:
+        # ИНКАПСУЛЯЦИЯ: _color - защищенный атрибут (одно подчеркивание)
+        # Это означает, что атрибут не предназначен для прямого доступа извне
+        self._color = color
+    
+    # СВОЙСТВА (property) - обеспечивают контролируемый доступ к атрибутам
+    @property
+    def color(self) -> str:
+        """Геттер для цвета - позволяет читать значение"""
+        return self._color
+    
+    @color.setter
+    def color(self, new_color: str) -> None:
+        """Сеттер для цвета - позволяет изменять значение с проверкой"""
+        if isinstance(new_color, str) and new_color:
+            self._color = new_color
+        else:
+            raise ValueError("Цвет должен быть непустой строкой")
+    
+    # АБСТРАКТНЫЕ МЕТОДЫ - должны быть реализованы в дочерних классах
+    @abstractmethod
+    def area(self) -> float:
+        """Вычислить площадь фигуры - абстрактный метод"""
+        pass
+    
+    @abstractmethod
+    def perimeter(self) -> float:
+        """Вычислить периметр фигуры - абстрактный метод"""
+        pass
+    
+    # МАГИЧЕСКИЕ МЕТОДЫ
+    def __str__(self) -> str:
+        """__str__ - вызывается при print() и str()"""
+        return f"Фигура цвета '{self._color}'"
+    
+    def __repr__(self) -> str:
+        """__repr__ - официальное строковое представление для разработчиков"""
+        return f"{self.__class__.__name__}(color='{self._color}')"
+
+
+# 2. КЛАСС CIRCLE - наследуется от Shape
+class Circle(Shape):
+    """
+    Класс Circle реализует конкретную фигуру - круг.
+    НАСЛЕДОВАНИЕ: получает все атрибуты и методы родителя + добавляет свои.
+    """
+    
+    def __init__(self, color: str, radius: float) -> None:
+        # super() вызывает конструктор родительского класса
+        super().__init__(color)
+        
+        # ИНКАПСУЛЯЦИЯ: радиус тоже защищенный атрибут
+        self._radius = radius
+    
+    # Реализация абстрактных методов - ОБЯЗАТЕЛЬНА
+    def area(self) -> float:
+        """Площадь круга: π × r²"""
+        return pi * self._radius ** 2
+    
+    def perimeter(self) -> float:
+        """Периметр круга (длина окружности): 2 × π × r"""
+        return 2 * pi * self._radius
+    
+    # Переопределение магических методов
+    def __str__(self) -> str:
+        """Собственная реализация __str__ для круга"""
+        return f"Круг: радиус={self._radius}, цвет='{self._color}', площадь={self.area():.2f}"
+    
+    def __eq__(self, other: object) -> bool:
+        """
+        __eq__ - сравнение на равенство (==)
+        Два круга равны, если у них одинаковый радиус
+        """
+        if not isinstance(other, Circle):
+            return False
+        return self._radius == other._radius
+
+
+# 3. КЛАСС RECTANGLE - тоже наследуется от Shape
+class Rectangle(Shape):
+    """
+    Класс Rectangle реализует прямоугольник.
+    Демонстрирует ПОЛИМОРФИЗМ - те же методы, но другая реализация.
+    """
+    
+    def __init__(self, color: str, width: float, height: float) -> None:
+        super().__init__(color)
+        self._width = width
+        self._height = height
+    
+    # Реализация абстрактных методов
+    def area(self) -> float:
+        """Площадь прямоугольника: ширина × высота"""
+        return self._width * self._height
+    
+    def perimeter(self) -> float:
+        """Периметр прямоугольника: 2 × (ширина + высота)"""
+        return 2 * (self._width + self._height)
+    
+    # Переопределение магических методов
+    def __str__(self) -> str:
+        """Собственная реализация __str__ для прямоугольника"""
+        return f"Прямоугольник: {self._width}×{self._height}, цвет='{self._color}', площадь={self.area():.2f}"
+    
+    def __eq__(self, other: object) -> bool:
+        """
+        Два прямоугольника равны, если у них одинаковые ширина и высота
+        """
+        if not isinstance(other, Rectangle):
+            return False
+        return self._width == other._width and self._height == other._height
+
+
+# 4. ДЕМОНСТРАЦИЯ РАБОТЫ
+def demonstrate_shapes():
+    """Функция для демонстрации всех возможностей"""
+    
+    print("=== ДЕМОНСТРАЦИЯ СИСТЕМЫ ГЕОМЕТРИЧЕСКИХ ФИГУР ===\n")
+    
+    # СОЗДАНИЕ ОБЪЕКТОВ
+    print("1. СОЗДАНИЕ ОБЪЕКТОВ:")
+    circle1 = Circle("красный", 5.0)
+    circle2 = Circle("синий", 3.0)
+    rectangle1 = Rectangle("зеленый", 4.0, 6.0)
+    rectangle2 = Rectangle("желтый", 4.0, 6.0)  # Такой же размер как rectangle1
+    
+    print(f"   Создан: {circle1}")
+    print(f"   Создан: {circle2}")
+    print(f"   Создан: {rectangle1}")
+    print(f"   Создан: {rectangle2}")
+    
+    # ДОСТУП К СВОЙСТВАМ
+    print("\n2. ДОСТУП К СВОЙСТВАМ:")
+    print(f"   Цвет circle1: {circle1.color}")  # Используем геттер
+    circle1.color = "оранжевый"  # Используем сеттер
+    print(f"   Новый цвет circle1: {circle1.color}")
+    
+    # ВЫЧИСЛЕНИЯ
+    print("\n3. ВЫЧИСЛЕНИЯ:")
+    print(f"   Площадь circle1: {circle1.area():.2f}")
+    print(f"   Периметр circle1: {circle1.perimeter():.2f}")
+    print(f"   Площадь rectangle1: {rectangle1.area()}")
+    print(f"   Периметр rectangle1: {rectangle1.perimeter()}")
+    
+    # СРАВНЕНИЕ ОБЪЕКТОВ
+    print("\n4. СРАВНЕНИЕ ОБЪЕКТОВ:")
+    print(f"   circle1 == circle2: {circle1 == circle2}")  # False - разные радиусы
+    print(f"   rectangle1 == rectangle2: {rectangle1 == rectangle2}")  # True - одинаковые размеры
+    
+    # РАБОТА С РАЗНЫМИ ТИПАМИ ФИГУР (ПОЛИМОРФИЗМ)
+    print("\n5. ПОЛИМОРФИЗМ - работа с разными фигурами через общий интерфейс:")
+    shapes = [circle1, circle2, rectangle1, rectangle2]
+    
+    total_area = 0
+    for shape in shapes:
+        # Все объекты имеют метод area(), несмотря на разные реализации
+        area = shape.area()
+        total_area += area
+        print(f"   Площадь {shape.__class__.__name__}: {area:.2f}")
+    
+    print(f"   Общая площадь всех фигур: {total_area:.2f}")
+    
+    # ПРОВЕРКА ИНКАПСУЛЯЦИИ
+    print("\n6. ПРОВЕРКА ИНКАПСУЛЯЦИИ:")
+    try:
+        # Попытка установить некорректный цвет
+        circle1.color = ""  # Вызовет ValueError
+    except ValueError as e:
+        print(f"   Ошибка при установке цвета: {e}")
+    
+    # ОФИЦИАЛЬНОЕ ПРЕДСТАВЛЕНИЕ
+    print("\n7. РАЗНЫЕ ВИДЫ СТРОКОВОГО ПРЕДСТАВЛЕНИЯ:")
+    print(f"   str(circle1): {circle1}")  # Красивое представление
+    print(f"   repr(circle1): {repr(circle1)}")  # Официальное представление
+
+
+# Запуск демонстрации
+if __name__ == "__main__":
+    demonstrate_shapes()
+```
+
+## Ключевые моменты реализации:
+
+### 1. **Абстрактный класс Shape**
+- Нельзя создать объект: `shape = Shape("красный")` вызовет ошибку
+- Задает общий интерфейс для всех фигур
+- Содержит абстрактные методы, которые должны быть реализованы в потомках
+
+### 2. **Наследование**
+- `Circle` и `Rectangle` наследуют от `Shape`
+- Получают общие атрибуты (`_color`) и методы
+- Могут добавлять свои уникальные атрибуты (`_radius`, `_width`, `_height`)
+
+### 3. **Инкапсуляция**
+- Защищенные атрибуты с `_`
+- Контролируемый доступ через свойства (`@property`)
+- Валидация данных в сеттерах
+
+### 4. **Полиморфизм**
+- Разные классы имеют одинаковые методы (`area()`, `perimeter()`)
+- Можно работать с разными фигурами через общий интерфейс
+- Каждый класс реализует методы по-своему
+
+### 5. **Магические методы**
+- `__str__` - для пользовательского представления
+- `__repr__` - для разработчиков
+- `__eq__` - для сравнения объектов
+
+Этот пример показывает все основные принципы ООП в действии на понятном примере!
+
+
+---
+---
 ---
 
 ## Задание 2: Система сотрудников компании
