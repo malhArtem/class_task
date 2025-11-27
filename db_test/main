@@ -1,0 +1,3 @@
+import db
+products = db.get_all_products()
+print(products)
