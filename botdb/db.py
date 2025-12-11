@@ -64,8 +64,8 @@ def add_user(id_: int, username: str, first_name: str, last_name: str):
 def update_user(id_: int,
                    score: int):
     query = f"""
-    UPDATE users SET score=? 
-    last_date={datetime.datetime.now()} 
+    UPDATE users SET score=?, 
+    last_date='{datetime.datetime.now()}'
     WHERE id=?
     """
     cur.execute(query, (score, id_))
@@ -77,4 +77,5 @@ def delete_user(id_: int):
     DELETE FROM users WHERE id=?"""
     cur.execute(query, (id_,))
     db.commit()
+
 
