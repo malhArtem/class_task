@@ -1,5 +1,22 @@
+import datetime
 import sqlite3
-from classes import User
+
+
+class User:
+    def __init__(self,id_,
+                 username,
+                 first_name,
+                 last_name,
+                 score,
+                 last_date):
+        self.id: int = id_
+        self.username: str = username
+        self.first_name: str = first_name
+        self.last_name: str = last_name
+        self.score: int = score
+        self.last_date: datetime.datetime = last_date
+
+
 
 db = sqlite3.connect("bot.db")
 cur = db.cursor()
@@ -10,71 +27,49 @@ def create_table():
     id INTEGER PRIMARY KEY,
     username VARCHAR(100),
     first_name VARCHAR(100),
-    last_name VARCHAR(100) 
+    last_name VARCHAR(100),
+    score INTEGER,
+    last_date DATETIME, 
     )
     """
     cur.execute(query)
-
 
 def get_all_users():
     query = """
     SELECT * FROM users"""
     cur.execute(query)
-    products = cur.fetchall()
-    products = [User(*product) for product in products]
-    return products
+    users = cur.fetchall()
+    users = [User(*user) for user in users]
+    return users
+
 
 def get_user(id_: int):
     query = """
     SELECT * FROM users WHERE id=?"""
     cur.execute(query, (id_,))
-    product = cur.fetchone()
-    product = User(product[0], product[1], product[2], product[3])
-    # product = Product(*product)
-    return product
+    user = User(*cur.fetchone())
+    return user
 
 
-def add_user(id: int, username: str, first_name: str, last_name: str):
-
-    query = """
-    INSERT INTO users (id, username, first_name, last_name)
-    VALUES (?, ?, ?, ?)
-    """
+def add_user(id_: int, username: str, first_name: str, last_name: str):
+    query = f"""
+    INSERT INTO users (id, username, first_name, last_name, score, last_date)
+    VALUES (?, ?, ?, ?, 0, {datetime.datetime.now()})"""
     try:
-        cur.execute(query, (id, username, first_name, last_name))
+        cur.execute(query, (id_, username, first_name, last_name))
         db.commit()
     except sqlite3.IntegrityError:
         pass
 
-
-# def update_product(id_: int,
-#                    name: str = None,
-#                    price: int = None,
-#                    quantity: int = None):
-#     if name is None and price is None and quantity is None:
-#         return False
-#
-#     query = """
-#     UPDATE products SET
-#     """
-#     query_params = []
-#     params = []
-#     if name is not None:
-#         query_params.append("name = ?")
-#         params.append(name)
-#     if price is not None:
-#         query_params.append("price = ?")
-#         params.append(price)
-#     if quantity is not None:
-#         query_params.append("quantity = ?")
-#         params.append(quantity)
-#
-#     query += ", ".join(query_params)
-#     query += " WHERE id = ?"
-#     params.append(id_)
-#     print(query)
-#     cur.execute(query, params)
-#     db.commit()
+def update_user(id_: int,
+                   score: int):
+    query = f"""
+    UPDATE users SET score=? 
+    last_date={datetime.datetime.now()} 
+    WHERE id=?
+    """
+    cur.execute(query, (score, id_))
+    db.commit()
 
 
 def delete_user(id_: int):
