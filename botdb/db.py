@@ -29,7 +29,7 @@ def create_table():
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     score INTEGER,
-    last_date DATETIME, 
+    last_date DATETIME 
     )
     """
     cur.execute(query)
@@ -54,7 +54,7 @@ def get_user(id_: int):
 def add_user(id_: int, username: str, first_name: str, last_name: str):
     query = f"""
     INSERT INTO users (id, username, first_name, last_name, score, last_date)
-    VALUES (?, ?, ?, ?, 0, {datetime.datetime.now()})"""
+    VALUES (?, ?, ?, ?, 0, '{datetime.datetime.now()}')"""
     try:
         cur.execute(query, (id_, username, first_name, last_name))
         db.commit()
@@ -77,3 +77,4 @@ def delete_user(id_: int):
     DELETE FROM users WHERE id=?"""
     cur.execute(query, (id_,))
     db.commit()
+
