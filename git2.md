@@ -160,7 +160,6 @@ python src/main.py
 ```bash
 pytest tests/
 ```
-```
 
 #### Файл `src/__init__.py` — **пустой** (нужен, чтобы Python распознавал папку как пакет).
 
