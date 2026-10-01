@@ -280,3 +280,367 @@ public:
 
 Потом меняетесь ролями.
 
+---
+---
+
+# ООП в C++: задания среднего уровня
+
+**Тема:** классы, конструкторы, инкапсуляция, работа объектов друг с другом.
+
+---
+
+## 📖 Мини-теория
+
+**Инкапсуляция** — поля класса скрыты (`private`), а доступ к ним идёт через методы (`public`). Это защищает данные от случайной порчи.
+
+```cpp
+class Wallet {
+private:              // ← снаружи не видно
+    double balance;
+public:               // ← снаружи доступно
+    void add(double x) { balance += x; }
+    double get() { return balance; }
+};
+```
+
+**Конструктор** — специальный метод, который вызывается автоматически при создании объекта. Имя совпадает с именем класса, тип возврата не пишется.
+
+```cpp
+class Point {
+    int x, y;
+public:
+    Point(int x, int y) {   // конструктор
+        this->x = x;        // this-> различает поле и параметр с тем же именем
+        this->y = y;
+    }
+};
+```
+
+**Список инициализации** — короткая запись того же самого:
+```cpp
+Point(int x, int y) : x(x), y(y) {}   // работает так же
+```
+
+**Деструктор** — метод, вызываемый при удалении объекта. Пишется с `~`:
+```cpp
+~Box() { cout << "Объект удалён"; }
+```
+
+**Копия объекта:** когда пишешь `Counter b = a;`, создаётся **отдельная копия** — изменения в `b` не влияют на `a`.
+
+**Передача по ссылке `&`** — если метод должен изменить **другой** объект, его принимают по ссылке:
+```cpp
+void attack(Player &enemy) { enemy.hp -= damage; }
+```
+
+**`this`** — указатель на текущий объект. Нужен, когда имя параметра совпадает с именем поля.
+
+---
+
+## Часть 1. «Что выведет программа?»
+
+**1.1**
+```cpp
+class Counter {
+    int value;
+public:
+    Counter(int start) {
+        value = start;
+    }
+    void inc() { value++; }
+    int get() { return value; }
+};
+
+int main() {
+    Counter a(5);
+    Counter b = a;
+    b.inc();
+    b.inc();
+    cout << a.get() << " " << b.get();
+    return 0;
+}
+```
+
+**1.2**
+```cpp
+class Box {
+    int size;
+public:
+    Box(int s) : size(s) {}
+    ~Box() {
+        cout << "Удалён " << size << endl;
+    }
+};
+
+int main() {
+    Box a(1);
+    {
+        Box b(2);
+    }
+    cout << "Конец" << endl;
+    return 0;
+}
+```
+
+**1.3**
+```cpp
+class Number {
+    int x;
+public:
+    Number(int x) : x(x) {}
+    Number add(Number other) {
+        return Number(x + other.x);
+    }
+    int get() { return x; }
+};
+
+int main() {
+    Number a(3);
+    Number b(4);
+    Number c = a.add(b);
+    cout << c.get();
+    return 0;
+}
+```
+
+**1.4**
+```cpp
+class Wallet {
+    int money;
+public:
+    Wallet(int m) : money(m) {}
+    void spend(int x) {
+        if (x <= money)
+            money -= x;
+    }
+    int get() { return money; }
+};
+
+int main() {
+    Wallet w(100);
+    w.spend(30);
+    w.spend(200);
+    w.spend(50);
+    cout << w.get();
+    return 0;
+}
+```
+
+---
+
+## Часть 2. «Найди ошибку»
+
+**2.1**
+```cpp
+class Point {
+    int x, y;
+public:
+    Point(int x, int y) {
+        x = x;
+        y = y;
+    }
+    void show() {
+        cout << x << " " << y;
+    }
+};
+
+int main() {
+    Point p(3, 4);
+    p.show();
+    return 0;
+}
+```
+*(подсказка: параметры конструктора имеют те же имена, что и поля)*
+
+**2.2**
+```cpp
+class Student {
+    string name;
+public:
+    Student(string n) : name(n) {}
+    string getName() { return name; }
+};
+
+int main() {
+    Student s("Иван");
+    cout << s.name;
+    return 0;
+}
+```
+
+**2.3**
+```cpp
+class Array {
+    int data[5];
+public:
+    void set(int i, int val) {
+        data[i] = val;
+    }
+    int get(int i) {
+        return data[i];
+    }
+};
+
+int main() {
+    Array a;
+    for (int i = 0; i <= 5; i++)
+        a.set(i, i * 2);
+    return 0;
+}
+```
+*(подсказка: где границы массива и что делает цикл)*
+
+---
+
+## Часть 3. «Заполни пропуски»
+
+**3.1**
+```cpp
+class Rectangle {
+    double w, h;
+public:
+    Rectangle(double w, double h) : ___(w), ___(h) {}
+
+    double area() {
+        return ___ * ___;
+    }
+
+    void scale(double k) {
+        w ___ k;
+        h *= ___;
+    }
+};
+```
+
+**3.2**
+```cpp
+class BankAccount {
+    string owner;
+    double balance;
+public:
+    BankAccount(string o, double b) : ___(o), ___(b) {}
+
+    void deposit(double x) {
+        balance ___ x;
+    }
+
+    bool withdraw(double x) {
+        if (x ___ balance) {
+            balance -= x;
+            return ___;
+        }
+        return false;
+    }
+
+    double get() { return ___; }
+};
+```
+
+---
+
+## Часть 4. «Напиши класс сам»
+
+**4.1. Класс `Fraction` (дробь)**
+Приватные поля: `int num` (числитель), `int den` (знаменатель).
+Методы:
+- конструктор с двумя параметрами;
+- `double value()` — возвращает десятичное значение дроби;
+- `void show()` — выводит в виде `num/den`.
+
+Проверь в `main()`: создай дроби 3/4 и 7/2, выведи их значения.
+
+---
+
+**4.2. Класс `Vector2D`**
+Приватные поля: `double x`, `double y`.
+Методы:
+- конструктор;
+- `double length()` — длина вектора (корень из `x² + y²`, используй `sqrt` из `<cmath>`);
+- `Vector2D add(Vector2D other)` — возвращает новый вектор-сумму.
+
+В `main()` сложи два вектора и выведи длину результата.
+
+---
+
+**4.3. Класс `Counter`**
+Приватное поле: `int value` (по умолчанию 0).
+Методы:
+- `inc()`, `dec()`, `reset()`;
+- `int get()` — возвращает значение;
+- **два конструктора**: без параметров (старт 0) и с параметром (стартовое значение).
+
+В `main()` создай два счётчика — один пустой, другой со стартом 10. Поработай с обоими.
+
+---
+
+**4.4. Класс `Book`**
+Приватные поля: `string title`, `int pages`, `int currentPage` (по умолчанию 1).
+Методы:
+- конструктор с названием и количеством страниц;
+- `void read(int n)` — читает `n` страниц вперёд (не выходя за `pages`);
+- `void show()` — выводит название и прогресс в процентах.
+
+Проверь: книга на 200 страниц, прочитай 50, покажи прогресс.
+
+---
+
+**4.5. Класс `Player`**
+Приватные поля: `string name`, `int hp` (100), `int damage` (10).
+Методы:
+- конструктор с именем;
+- `void attack(Player &enemy)` — наносит урон врагу (принимай **по ссылке**!);
+- `bool isAlive()` — жив ли (`hp > 0`);
+- `void show()` — выводит имя и текущее здоровье.
+
+В `main()` создай двух игроков и устрой бой в цикле `while`, пока один не умрёт.
+
+---
+
+## Часть 5. «Собери класс из кусочков»
+
+Строки перепутаны. Расставь в правильном порядке.
+
+**5.1**
+```cpp
+    }
+        return 3.14 * r * r;
+    double area() {
+class Circle {
+public:
+    Circle(double r) : r(r) {}
+};
+private:
+    double r;
+```
+
+**5.2**
+```cpp
+    }
+        balance += x;
+    void deposit(double x) {
+class Wallet {
+public:
+private:
+    double balance;
+    Wallet(double b) : balance(b) {}
+};
+```
+
+---
+
+## Часть 6. Работа в парах
+
+Один студент **проектирует класс**: придумывает назначение, поля, конструктор и 3–4 метода, описывает их словами.
+Второй — **реализует класс** по описанию и пишет тестовый `main()`, где проверяет все методы.
+
+Затем меняются ролями и делают второй класс.
+
+---
+
+## Часть 7. «Придумай сам»
+
+Придумай класс с **приватными полями**, конструктором и **минимум тремя методами**, один из которых возвращает значение (не `void`). Реализуй его и проверь в `main()`.
+
+Примеры тем: `Timer`, `Product`, `Movie`, `Song`, `Task`, `Elevator`.
+
+-
