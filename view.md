@@ -424,6 +424,3 @@ SELECT product_id, title, category, price_rub FROM v_product_catalog;
 ## Что сдавать
 
 - [ ] PDF-отчёт со скриншотами по всем 7 заданиям
-
-| `substr(month, 5, 2)` вместо `substr(month, 6, 2)` | Q1 = 146800, не другое число |
-| `UPDATE` простого `VIEW` без `INSTEAD OF` | падает с ошибкой |
